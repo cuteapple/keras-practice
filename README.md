@@ -1,6 +1,7 @@
 # keras-practice
 
-This is practice repo, it's meant to contain all the comment I feel and hope it will help others in learning
+This is practice repo, it's meant to contain all the comment I feel and I think is important
+hope it will help others in learning
 
 It is recommended to follow *main* branch and looking at comments (in code)
 
