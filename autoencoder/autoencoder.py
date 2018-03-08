@@ -5,19 +5,22 @@ import numpy as np
 
 # Captalize for Layer
 
-
-Encoder = Dense(32, activation='relu')
-Decoder = Dense(784, activation='sigmoid')
+Encode = Dense(32, activation='relu')
+Decode = Dense(784, activation='sigmoid')
 
 x = Input(shape=(784,))
-z = Encoder(x)
-y = Decoder(z)
+z = Encode(x)
+y = Decode(z)
 
 autoencoder = Model(x, y)
 encoder = Model(x, z)
 
-_z = Input(shape=(32,))
-decoder = Model(_z, Decoder(_z))
+# I wish I can use any tensor... (other than Input)
+#    Model should just figure out it is first layer and get it's output shape
+# so I can remove below 2 lines
+z = Input(shape=(32,))
+y = Decode(z)
+decoder = Model(z, y)
 
 '''
 # create a placeholder for an encoded (32-dimensional) input
