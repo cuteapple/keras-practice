@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, LeakyReLU
 from keras.models import Model, Sequential
 from keras.datasets import mnist
 import keras.regularizers as regularizers
@@ -10,6 +10,7 @@ del types
 
 options.load = True
 options.train = True
+options.epochs = 5
 options.save = True
 options.filename = 'model.h5'
 
@@ -64,7 +65,7 @@ if options.load:
 if options.train:
 	autoencoder.fit(
 		x_train, x_train,
-		epochs=20,
+		epochs = options.epochs,
 		batch_size=256,
 		shuffle=True,
 		validation_data=(x_test, x_test))
@@ -72,6 +73,12 @@ if options.train:
 if options.save:
 	print('saving {}'.format(options.filename))
 	autoencoder.save_weights(options.filename)
+
+
+
+#
+# see result
+#
 
 # encode and decode test set
 encoded_imgs = encoder.predict(x_test)
@@ -91,8 +98,6 @@ outdir = 'o/{}'.format(int(time.time()))
 os.makedirs(outdir)
 outdir_for = lambda name,postfix='',extension='png': '{}/{}_{}.{}'.format(outdir,name,postfix,extension)
 
-#no need for it, it just a constant, maybe change it when need, but not now
-#n=10
 for i in range(10):
     cv2.imwrite(outdir_for(i,'i'),to_img(x_test[i]))
     cv2.imwrite(outdir_for(i,'o'),to_img(decoded_imgs[i]))
