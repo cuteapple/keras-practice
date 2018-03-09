@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, LeakyReLU
+from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D
 from keras.models import Model, Sequential
 from keras.datasets import mnist
 import keras.regularizers as regularizers
@@ -9,7 +9,7 @@ options = types.SimpleNamespace()
 del types
 
 options.load = True
-options.train = True
+options.train = False
 options.epochs = 20
 options.save = True
 options.test = True
@@ -27,8 +27,8 @@ if options.train or options.test:
 	x_test = x_test.astype('float32') / 255.
 
 	# reshape to (sample_count,flatten)
-	x_train = x_train.reshape(x_train.shape[0],784)
-	x_test = x_test.reshape(x_test.shape[0],784)
+	x_train = x_train.reshape(x_train.shape[0],28,28,1)
+	x_test = x_test.reshape(x_test.shape[0],28,28,1)
 
 	print(x_train.shape) #(?,784)
 	print(x_test.shape) #(?,784)
@@ -37,19 +37,26 @@ if options.train or options.test:
 # Prepare Network
 #
 
-x = Input(shape=(784,))
-z = Dense(128, activation='relu',name='enc_d128')(x)
-z = Dense(64, activation='relu',name='enc_d64')(z)
-z = Dense(32, activation='relu',name='enc_d32')(z)
+x = Input(shape=(28,28,1))
+z = Conv2D(16, (3, 3), activation='relu', padding='same')(x)
+z = MaxPooling2D((2, 2), padding='same')(z)
+z = Conv2D(8, (3, 3), activation='relu', padding='same')(z)
+z = MaxPooling2D((2, 2), padding='same')(z)
+z = Conv2D(8, (3, 3), activation='relu', padding='same')(z)
+z = MaxPooling2D((2, 2), padding='same')(z)
 Encode = Model(x,z,name='Encoder')
 
-z = Input(shape=(32,))
-y = Dense(64, activation='relu',name='dec_d64')(z)
-y = Dense(128, activation='relu',name='dec_d128')(z)
-y = Dense(784, activation='sigmoid',name='dec_d784')(z)
+z = Input(shape = Encode.output_shape[1:])
+y = Conv2D(8, (3, 3), activation='relu', padding='same')(z)
+y = UpSampling2D((2, 2))(y)
+y = Conv2D(8, (3, 3), activation='relu', padding='same')(y)
+y = UpSampling2D((2, 2))(y)
+y = Conv2D(16, (3, 3), activation='relu')(y)
+y = UpSampling2D((2, 2))(y)
+y = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(y)
 Decode = Model(z,y,name='Decoder')
 
-x = Input(shape=(784,))
+x = Input(shape=(28,28,1))
 z = Encode(x)
 y = Decode(z)
 
