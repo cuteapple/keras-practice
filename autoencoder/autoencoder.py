@@ -20,27 +20,32 @@ options.filename = 'model.h5'
 # Prepare Data
 #
 
-(x_train, _), (x_test, _) = mnist.load_data()
-#grayscale 0-255
-x_train = x_train.astype('float32') / 255.
-x_test = x_test.astype('float32') / 255.
+if options.train or options.test:
+	(x_train, _), (x_test, _) = mnist.load_data()
+	#grayscale 0-255
+	x_train = x_train.astype('float32') / 255.
+	x_test = x_test.astype('float32') / 255.
 
-# reshape to (sample_count,flatten)
-x_train = x_train.reshape(x_train.shape[0],784)
-x_test = x_test.reshape(x_test.shape[0],784)
+	# reshape to (sample_count,flatten)
+	x_train = x_train.reshape(x_train.shape[0],784)
+	x_test = x_test.reshape(x_test.shape[0],784)
 
-print(x_train.shape) #(?,784)
-print(x_test.shape) #(?,784)
+	print(x_train.shape) #(?,784)
+	print(x_test.shape) #(?,784)
 
 #
 # Prepare Network
 #
 
 x = Input(shape=(784,))
-z = Dense(32, activation='relu',name='enc_d32')(x)
+z = Dense(128, activation='relu',name='enc_d128')(x)
+z = Dense(64, activation='relu',name='enc_d64')(z)
+z = Dense(32, activation='relu',name='enc_d32')(z)
 Encode = Model(x,z,name='Encoder')
 
 z = Input(shape=(32,))
+y = Dense(64, activation='relu',name='dec_d64')(z)
+y = Dense(128, activation='relu',name='dec_d128')(z)
 y = Dense(784, activation='sigmoid',name='dec_d784')(z)
 Decode = Model(z,y,name='Decoder')
 
@@ -68,8 +73,9 @@ if options.load:
 	try:
 		print('loading {}'.format(options.filename))
 		autoencoder.load_weights(options.filename)
-	except OSError:
-		print('load weights failed')
+	except (OSError,ValueError) as e:
+		print(str(e))
+		print('load weights failed, recreate')
 
 if options.train:
 	autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
