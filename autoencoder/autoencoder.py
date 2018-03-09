@@ -8,10 +8,10 @@ options = types.SimpleNamespace()
 del types
 
 options.load = True
-options.train = True
+options.train = False
 options.epochs = 20
-options.save = True
-options.test = False
+options.save = False
+options.test = True
 options.plot_model = False
 options.filename = 'model.h5'
 
