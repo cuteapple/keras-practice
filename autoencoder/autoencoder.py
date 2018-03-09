@@ -1,7 +1,6 @@
 from keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D
-from keras.models import Model, Sequential
+from keras.models import Model
 from keras.datasets import mnist
-import keras.regularizers as regularizers
 import numpy as np
 
 import types
@@ -9,11 +8,11 @@ options = types.SimpleNamespace()
 del types
 
 options.load = True
-options.train = False
+options.train = True
 options.epochs = 20
 options.save = True
-options.test = True
-options.plot_model = True
+options.test = False
+options.plot_model = False
 options.filename = 'model.h5'
 
 #
