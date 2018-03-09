@@ -9,6 +9,7 @@ options = types.SimpleNamespace()
 del types
 
 options.load = True
+options.force_load = True
 options.train = True
 options.epochs = 20
 options.save = True
@@ -37,10 +38,14 @@ print(x_test.shape) #(?,784)
 #
 
 x = Input(shape=(784,))
-z = Dense(32, activation='relu',name='enc_d32')(x)
+z = Dense(128, activation='relu',name='enc_d128')(x)
+z = Dense(64, activation='relu',name='enc_d64')(z)
+z = Dense(32, activation='relu',name='enc_d32')(z)
 Encode = Model(x,z,name='Encoder')
 
 z = Input(shape=(32,))
+y = Dense(64, activation='relu',name='dec_d64')(z)
+y = Dense(128, activation='relu',name='dec_d128')(z)
 y = Dense(784, activation='sigmoid',name='dec_d784')(z)
 Decode = Model(z,y,name='Decoder')
 
@@ -68,8 +73,10 @@ if options.load:
 	try:
 		print('loading {}'.format(options.filename))
 		autoencoder.load_weights(options.filename)
-	except OSError:
-		print('load weights failed')
+	except (OSError,ValueError) as e:
+		print('load weights failed, please turn off load option to recreate')
+		print(str(e))
+		raise SystemExit()
 
 if options.train:
 	autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
