@@ -7,6 +7,7 @@ follows https://blog.keras.io/building-autoencoders-in-keras.html with lots of m
 # required module
  - keras
  - opencv-python
+ - h5py
 
 ---
 
